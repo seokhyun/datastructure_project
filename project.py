@@ -258,10 +258,43 @@ def menu_6(a):#delete user who mentioned a word
 		print(j,i)
 		j=j+1
 
-	print("choose the member you want to delete from 0 to %d:",%(j))
 	
+	delete_user_number=input("choose the member you want to delete from 0 to %d:"%(j-1))
+	delete_user_number=int(delete_user_number)
+	
+	for i in user_list:
+		if i.num==user_who_mention_a_word[delete_user_number]:
+			user_list.remove(i)
+	print("The user who mentioned a word is deleted")
 
 
+def menu_7(a):
+	user_friend_list=a[2]
+	user_list=a[0]
+	user_word_list=a[1]
+	top_word_dic=a[3]
+	print("Delete all users who mentioned a word")
+	delete_word_input= input("word:")
+	user_word_list_only_word=[]
+	user_who_mention_a_word=[]
+	for i in user_word_list:
+		user_word_list_only_word.append(i.word)#put only word in the list
+	for i in range(len(user_word_list_only_word)):
+		if delete_word_input == user_word_list_only_word[i]:#if they are same
+			
+			if(delete_word_input not in user_who_mention_a_word):
+				
+				user_who_mention_a_word.append(user_word_list[i].num) 
+	user_who_mention_a_word=list(set(user_who_mention_a_word))
+	for j in user_who_mention_a_word:
+		print(j)
+	for i in user_list:
+		for j in user_who_mention_a_word:
+			if i.num ==j:
+				user_list.remove(i)
+
+	print("all user who mentioned a word is deleted")
+	
 
 
 
@@ -279,7 +312,7 @@ def main():
 
 
 a=menu_0()
-menu_6(a)
+menu_7(a)
 #menu_2(a)
 #menu_4(a)
 
