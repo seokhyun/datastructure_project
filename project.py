@@ -39,7 +39,7 @@ def print_menu():
 	print("1. display statistics")
 	print("2. Top 5 most tweeted words")
 	print("3. Top 5 most tweeted users")
-	print("4. Find users who tweeted a word (e.g., ’연세대’)")
+	print("4. Find users who tweeted a word (e.g.)")
 	print("5. Find all people who are friends of the above users")
 	print("6. Delete users who mentioned a word")
 	print("7. Delete all users who mentioned a word")
@@ -55,10 +55,15 @@ class User_node:
 		self.num=0
 		self.date=None
 		self.id_eng=None
-		self.tweet_word_by_user=User_word_node()
+		self.tweet_word_by_user=None
 		self.friend=None
 	def add_word(self,word):
-		self.tweet_word_by_user=self.tweet_word_by_user.tweet_word(word)#how many word did he used
+		new_word=User_word_node()
+		new_word.num=word.num
+		new_word.date=word.date
+		new_word.word=word.word
+		new_word.next=self.tweet_word_by_user
+		self.tweet_word_by_user=new_word#how many word did he used
 	def add_friend(self,friend):
 		new_friend=Adj()
 		new_friend.num=friend
@@ -66,6 +71,13 @@ class User_node:
 		self.friend =new_friend
 
 
+
+def count_linked_list(a):
+	i=0
+	while a !=None:
+		i=i+1
+		a=a.next
+	return i
 class User_word_node:
 	def __init__(self):
 		self.num=0
@@ -73,15 +85,7 @@ class User_word_node:
 		self.word=None
 		self.next=None
 		self.linked_list_num=0
-	def tweet_word(self,word):
-		n=User_word_node()
-		n.num=word.num
-		n.date=word.date
-		n.word=word.word
 
-		n.next=self
-		n.linked_list_num=self.linked_list_num+1
-		return n
 
 
 
@@ -172,11 +176,13 @@ def menu_1(a):
 	user_list=sorted(user_list,key=sorting_key_for_menu3,reverse=True)
 	total=0
 	for user in user_list:
-		total=total+user.tweet_word_by_user.linked_list_num
+		print(count_linked_list(user.tweet_word_by_user))
+
+		total=total+count_linked_list(user.tweet_word_by_user)
 	Average=total/len(user_list)
 	print("Average tweets per user:", Average)
-	print("Minium tweets per user: ",user_list[0].tweet_word_by_user.linked_list_num)
-	print("Maximum tweets per user: ",user_list[-1].tweet_word_by_user.linked_list_num)
+	print("Minium tweets per user: ",count_linked_list(user_list[-1].tweet_word_by_user))
+	print("Maximum tweets per user: ",count_linked_list(user_list[0].tweet_word_by_user))
 
 
 
@@ -187,7 +193,7 @@ def menu_2(items):
 
 def sorting_key_for_menu3(user):
 	
-	return user.tweet_word_by_user.linked_list_num
+	return count_linked_list(user.tweet_word_by_user) 
 def menu_3(a):
 	user_list=a[0]
 	user_word_list=a[1]
@@ -200,7 +206,7 @@ def menu_3(a):
 	print("top 5 most tweeted user")
 	for user in user_list[:5]:
 		print (user.num)
-		print(user.tweet_word_by_user.linked_list_num)
+		print(count_linked_list(user.tweet_word_by_user))
 		print("")
 
 def menu_4(a):
@@ -229,21 +235,37 @@ def menu_5(a):
 			user.friend=user.friend.next
 		print("")
 	
-def menu_6(a):
+def menu_6(a):#delete user who mentioned a word
 	user_friend_list=a[2]
 	user_list=a[0]
 	user_word_list=a[1]
 	top_word_dic=a[3]
 	print("Delete users who mentioned a word")
-	word_input= input("word:")
-	user_word_list_for_menu6= []
-	for i in top_word_dic:
-		user_word_list_for_menu6.append(i[0])
-	if word_input in user_word_list_for_menu6:##find the number for the word input
+	delete_word_input= input("word:")
+	user_word_list_only_word=[]
+	user_who_mention_a_word=[]
+	for i in user_word_list:
+		user_word_list_only_word.append(i.word)#put only word in the list
+	for i in range(len(user_word_list_only_word)):
+		if delete_word_input == user_word_list_only_word[i]:#if they are same
+			
+			if(delete_word_input not in user_who_mention_a_word):
+				
+				user_who_mention_a_word.append(user_word_list[i].num) 
+	user_who_mention_a_word=list(set(user_who_mention_a_word))
+	j=0
+	for i in user_who_mention_a_word:
+		print(j,i)
+		j=j+1
+
+	print("choose the member you want to delete from 0 to %d:",%(j))
+	
 
 
-def menu_99():
-	return -1
+
+
+
+
 
 def main():
 	print_menu()
