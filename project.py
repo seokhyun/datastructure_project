@@ -30,6 +30,33 @@ def heapsort(A):
 		A[i-1],A[0]=A[0],A[i-1]
 		heapify(A,0,i-1)
 
+def bfs(vertices, s):
+    for u in vertices:
+        if u.n_bfs != s.n_bfs:
+            u.color = WHITE
+            u.d = 1E10
+            u.parent = -1
+    s.color = GRAY
+    s.d = 0
+    s.parent = -1
+    
+    q = Queue()
+    q.create_queue(len(vertices))
+    q.enqueue(s.n_bfs)        # enquque node number
+    while not q.is_empty():
+        u = q.dequeue()   # node number
+        adj_v = vertices[u].friend
+
+        while adj_v:
+            if vertices[adj_v.n_bfs].color == WHITE:
+                vertices[adj_v.n_bfs].color = GRAY   # gray
+                vertices[adj_v.n_bfs].d = vertices[u].d + 1
+                vertices[adj_v.n_bfs].parent = u
+                q.enqueue(adj_v.n_bfs)
+            adj_v = adj_v.next
+        vertices[u].color = BLACK           # black
+
+
 
 
 
@@ -46,29 +73,32 @@ def print_menu():
 	print("8. Find strongly connected components")
 	print("9. Find shortest path from a given user")
 	print("99. Quit")
-class Adj:
-	def __init__(self):
-		self.num=None
-		self.next=None
-class User_node:
-	def __init__(self):
-		self.num=0
-		self.date=None
-		self.id_eng=None
-		self.tweet_word_by_user=None
-		self.friend=None
-	def add_word(self,word):
-		new_word=User_word_node()
-		new_word.num=word.num
-		new_word.date=word.date
-		new_word.word=word.word
-		new_word.next=self.tweet_word_by_user
-		self.tweet_word_by_user=new_word#how many word did he used
-	def add_friend(self,friend):
-		new_friend=Adj()
-		new_friend.num=friend
-		new_friend.next=self.friend
-		self.friend =new_friend
+
+
+
+class Queue:
+    def __init__(self):
+        self.front = 0
+        self.rear = 0
+        self.sz = 0
+        self.buf = []
+    def create_queue(self,sz):
+        self.sz = sz
+        self.buf = list(range(sz))  # malloc(sizeof(int)*sz)
+    def enqueue(self,val):
+        self.buf[self.rear] = val
+        self.rear = (self.rear + 1) % self.sz
+    def dequeue(self):
+        res = self.buf[self.front]
+        self.front = (self.front + 1) % self.sz
+        return res
+    def is_empty(self):
+        return self.front == self.rear
+WHITE = 0
+GRAY = 1
+BLACK = 2
+
+
 
 
 
@@ -157,6 +187,7 @@ def menu_0():
 
 
 
+
 	a=[user_list,user_word_list,user_friend_list,top_word_dic]
 	return a
 
@@ -220,21 +251,25 @@ def menu_4(a):
 		if searching_word == user_word_list_only_word[i]:
 			print (user_word_list[i].num)
 
-
 def menu_5(a):
 	user_friend_list=a[2]##friend number two of them giving point=me, getting point =friend
 	user_list=a[0]#user information
-	for friend in user_friend_list:
-		for user in user_list:
-			if(user.num==friend.me):
+	for user in user_list:
+		for friend in user_friend_list:
+			if(user.num==friend.me):	
 				user.add_friend(friend.friend)
 	for user in user_list:
-		print(user.num,"'s friends")
-		while (user.friend):
-			print(user.friend.num)
-			user.friend=user.friend.next
-		print("")
+		print(user.num ,"'s friend")
+		p=user.friend
+		while p !=None:
+			print(p.num)
+
+			p=p.next
+		print("-----------------------------------")
+
 	
+	
+
 def menu_6(a):#delete user who mentioned a word
 	user_friend_list=a[2]
 	user_list=a[0]
@@ -294,7 +329,113 @@ def menu_7(a):
 				user_list.remove(i)
 
 	print("all user who mentioned a word is deleted")
+
+
 	
+
+class Adj:
+	def __init__(self):
+		self.n_bfs=None
+		self.next=None
+		self.num=None
+class User_node:
+	def __init__(self):
+		self.num=0
+		self.date=None
+		self.id_eng=None
+		self.tweet_word_by_user=None
+		self.friend=None
+		self.color = WHITE
+		self.parent=-1
+		self.d_bfs=0
+		self.n_bfs=0
+	def add_word(self,word):
+		new_word=User_word_node()
+		new_word.num=word.num
+		new_word.date=word.date
+		new_word.word=word.word
+		new_word.next=self.tweet_word_by_user
+		self.tweet_word_by_user=new_word#how many word did he used
+	def add_friend(self,friend):
+		new_friend=Adj()
+		new_friend.num=friend
+		
+		new_friend.next=self.friend
+		self.friend =new_friend
+
+
+
+def menu_9(a):
+	user_friend_list=a[2]##friend number two of them giving point=me, getting point =friend
+	user_list=a[0]#user information
+	i=0#put all the number from 0-181
+	for user in user_list:
+		user.n_bfs=i
+		i=i+1
+	for user in user_list:
+		for friend in user_friend_list:
+
+			if(user.num==friend.me):
+				
+				for user in user_list:
+					user.add_friend(friend.friend)
+
+
+
+	
+	for user in user_list:
+		
+		for user in user_list:
+			print(user.num ,"'s friend")
+			p=user.friend
+			while p !=None:
+				print(p.num)
+
+				p=p.next
+		print("-----------------------------------")
+
+
+
+
+
+def bfs(vertices, s):
+    for u in vertices:
+        if u.n_bfs != s.n_bfs:
+            u.color = WHITE
+            u.d = 1E10
+            u.parent = -1
+    s.color = GRAY
+    s.d = 0
+    s.parent = -1
+    
+    q = Queue()
+    q.create_queue(len(vertices))
+    q.enqueue(s.n_bfs)        # enquque node number
+    while not q.is_empty():
+        u = q.dequeue()   # node number
+        adj_v = vertices[u].friend
+
+        while adj_v:
+            if vertices[adj_v.n_bfs].color == WHITE:
+                vertices[adj_v.n_bfs].color = GRAY   # gray
+                vertices[adj_v.n_bfs].d = vertices[u].d + 1
+                vertices[adj_v.n_bfs].parent = u
+                q.enqueue(adj_v.n_bfs)
+            adj_v = adj_v.next
+        vertices[u].color = BLACK           # black
+
+
+
+def print_user(user_list,n_bfs):
+	print(user_list[n_bfs].num)
+	print(user_list[n_bfs].color)
+	print(user_list[n_bfs].parent)
+	p=user_list[n_bfs].friend
+	while p:
+		print(user_list[p.n_bfs].num)
+		p=p.next
+	print("")
+
 
 
 
@@ -312,7 +453,7 @@ def main():
 
 
 a=menu_0()
-menu_7(a)
+menu_9(a)
 #menu_2(a)
 #menu_4(a)
 
