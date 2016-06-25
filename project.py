@@ -409,15 +409,22 @@ class DepthFirstSearch:
     def scc(self):
     	self.dfs()
     	#self.dfs_print()
-    	vset=transpose(self.vertices,self.user_n_dfs_dic)
-    	sorted_f_dfs= self.dfs_f_sort()
-    	for vertex in self.vertices:
+    	self.vertices=transpose(self.vertices,self.user_n_dfs_dic)##finished transposing
+    	sorted_f_dfs= self.dfs_f_sort()##dfs backward
+    	vset=self.vertices
+    	for vertex in vset:
     		vertex.color =WHITE
     		vertex.parent=-1
-    	for n in sorted_f_dfs:
-    		if self.vertices[n.n_dfs].color==WHITE:
 
-    			self.scc_find(vset[n.n_dfs])
+
+    	for vertex in sorted_f_dfs:
+    		if vset[vertex.n_dfs].color==WHITE:
+    			self.scc_find(vset[vertex.n_dfs])
+    		
+    #	for n in sorted_f_dfs:
+    #		if self.vertices[n.n_dfs].color==WHITE:
+    #			print(1)
+    			#self.scc_find(vset[n.n_dfs])
     def scc_find(self, u):
     	u.color=GRAY
     	v=u.friend
@@ -426,22 +433,26 @@ class DepthFirstSearch:
     	while v:
     		if self.vertices[self.user_n_dfs_dic[v.num]].color ==WHITE:
     			found=True
+
     			self.vertices[self.user_n_dfs_dic[v.num]].parent=u.num
     			self.scc_find(self.vertices[self.user_n_dfs_dic[v.num]])
+    			print("#######################")
+    			
+
     		v=v.next
+
     	if not found:
-    		print("SCC ")
+    		print("SCC :")
     		self.print_scc(u)
-    		print("&&&&&&&&&&77")
+    		print ("")
+    		
     	u.color =BLACK
     def print_scc(self,u):
-    	print(u.num,  "   ")
+    	print(u.num)
     	vset=self.vertices
-    	print(self.user_n_dfs_dic[u.parent])
-    	
-
-    	if self.user_n_dfs_dic[u.parent]>=0:
-    		self.print_scc(vset[self.user_n_dfs_dic[u.parent]])
+    	if u.parent in self.user_n_dfs_dic:
+    	   	if self.user_n_dfs_dic[u.parent]>=0:
+    	   		self.print_scc(vset[self.user_n_dfs_dic[u.parent]])
 
 
 
@@ -510,7 +521,6 @@ def menu_8(a):
 	DFS.set_vertices(user_list,user_n_dfs_dic)
 	#DFS.dfs()
 	#DFS.dfs_print()
-	print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 	DFS.scc()
 
 
@@ -614,14 +624,14 @@ def main():
 
 	
 
-#main()
-a=menu_0()
+main()
+
 #menu_2(a)
 
 
 
 #a=menu_0()
-menu_9(a)
+
 #menu_2(a)
 #menu_4(a)
 
