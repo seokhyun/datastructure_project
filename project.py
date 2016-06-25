@@ -183,7 +183,7 @@ def menu_1(a):
 	user_list=sorted(user_list,key=sorting_key_for_menu3,reverse=True)
 	total=0
 	for user in user_list:
-		print(count_linked_list(user.tweet_word_by_user))
+		
 
 		total=total+count_linked_list(user.tweet_word_by_user)
 	Average=total/len(user_list)
@@ -308,36 +308,24 @@ def menu_9(a):##not finished
 		i=i+1
 	user_n_bfs_dic={}
 	for user in user_list:
-		user_n_bfs_dic[user.num]=user.n_bfs
-		
-	for user in user_list:
-		print (user.num, user_n_bfs_dic[user.num])
+		user_n_bfs_dic[user.num]=int(user.n_bfs)
 
-	for user in user_list:
-		for friend in user_friend_list:
-			if(user.num==friend.me):	
-				user.add_friend(friend.friend)
 
-	for user in user_list:
-		print(user.num ,"'s friend")
-		p=user.friend
-		while p !=None:
-			if p.num in user_n_bfs_dic:
-				print(p.num , user_n_bfs_dic[p.num])
-
-			p=p.next
-		print("-----------------------------------")
-	bfs(user_list, user_list[0],user_n_bfs_dic)
+	making_friend_adj_list(user_list,user_friend_list)
+	from_person="1"
+	from_person=input("from whom?")
+	find_person=input("find whom?")
+	
+	find_person="1"
+	if from_person in user_n_bfs_dic and find_person in user_n_bfs_dic:
+		#print(user_list[user_n_bfs_dic[from_person]].num)
+		bfs(user_list, user_list[user_n_bfs_dic[from_person]],user_n_bfs_dic)
+		print("shorstest path from %s to %s is %d"%(user_list[user_n_bfs_dic[from_person]].num, user_list[user_n_bfs_dic[find_person]].num, user_list[user_n_bfs_dic[find_person]].d_bfs))
+	else:
+		print("either from_person or finding_person is not in the list")
 	#for user in user_list:
-		
-	#	for user in user_list:
-	#		print(user.num ,"'s friend")
-	#		p=user.friend
-	#		while p !=None:
-	#			print(p.num)
+#		print(user.num, user.d_bfs)
 
-	#			p=p.next
-	#	print("-----------------------------------")
 
 
 
@@ -348,27 +336,31 @@ def bfs(vertices, s,user_n_bfs_dic):
     for u in vertices:
         if u.n_bfs != s.n_bfs:
             u.color = WHITE
-            u.d = 1E10
+            u.d_bfs = 1E10
             u.parent = -1
     s.color = GRAY
-    s.d = 0
+    s.d_bfs = 0
     s.parent = -1
     
     q = Queue()
     q.create_queue(len(vertices))
-    q.enqueue(s.n_bfs)        # enquque node number
+    q.enqueue(s.num)        # enquque node number
+    
     while not q.is_empty():
         u = q.dequeue()   # node number
-        adj_v = vertices[u].friend
+        
+        adj_v = vertices[user_n_bfs_dic[u]].friend
+
 
         while adj_v:
-            if vertices[user_n_bfs_dic[adj_v]].color == WHITE:
-                vertices[user_n_bfs_dic[adj_v]].color = GRAY   # gray
-                vertices[user_n_bfs_dic[adj_v]].d = vertices[u].d + 1
-                vertices[user_n_bfs_dic[adj_v]].parent = u
-                q.enqueue(user_n_bfs_dic[adj_v])
+            if vertices[user_n_bfs_dic[adj_v.num]].color == WHITE:
+                vertices[user_n_bfs_dic[adj_v.num]].color = GRAY   # gray
+                vertices[user_n_bfs_dic[adj_v.num]].d_bfs = vertices[user_n_bfs_dic[u]].d_bfs + 1
+                vertices[user_n_bfs_dic[adj_v.num]].parent = u
+                q.enqueue(adj_v.num)
+
             adj_v = adj_v.next
-        vertices[u].color = BLACK           # black
+        vertices[user_n_bfs_dic[u]].color = BLACK           # black
 
 
 
@@ -408,8 +400,47 @@ class DepthFirstSearch:
     	for user in self.vertices:
     		print(user.num, user.n_dfs, user.d_dfs, user.f_dfs)
     def dfs_f_sort(self):
-    	self.vertices= sorted(self.vertices, key= sorting_key_for_dfs_f_sort, reverse=True)
-    	self.dfs_print()
+    	vset= sorted(self.vertices, key= sorting_key_for_dfs_f_sort, reverse=True)
+    	return vset
+    	
+    def scc(self):
+    	self.dfs()
+    	#self.dfs_print()
+    	vset=transpose(self.vertices,self.user_n_dfs_dic)
+    	sorted_f_dfs= self.dfs_f_sort()
+    	for vertex in self.vertices:
+    		vertex.color =WHITE
+    		vertex.parent=-1
+    	for n in sorted_f_dfs:
+    		if self.vertices[n.n_dfs].color==WHITE:
+
+    			self.scc_find(vset[n.n_dfs])
+    def scc_find(self, u):
+    	u.color=GRAY
+    	v=u.friend
+
+    	found =False
+    	while v:
+    		if self.vertices[self.user_n_dfs_dic[v.num]].color ==WHITE:
+    			found=True
+    			self.vertices[self.user_n_dfs_dic[v.num]].parent=u.num
+    			self.scc_find(self.vertices[self.user_n_dfs_dic[v.num]])
+    		v=v.next
+    	if not found:
+    		print("SCC ")
+    		self.print_scc(u)
+    		print("&&&&&&&&&&77")
+    	u.color =BLACK
+    def print_scc(self,u):
+    	print(u.num,  "   ")
+    	vset=self.vertices
+    	print(self.user_n_dfs_dic[u.parent])
+    	
+
+    	if self.user_n_dfs_dic[u.parent]>=0:
+    		self.print_scc(vset[self.user_n_dfs_dic[u.parent]])
+
+
 
 def sorting_key_for_dfs_f_sort(user):
 	return user.f_dfs
@@ -434,6 +465,8 @@ class User_node:
 		self.d_dfs=0
 		self.f_dfs=0
 		self.n_dfs=0
+		self.n_bfs=0
+		self.d_bfs=0
 
 	def add_word(self,word):
 		new_word=User_word_node()
@@ -472,10 +505,10 @@ def menu_8(a):
 	#print_user_friend(user_list_transpose)
 	DFS=DepthFirstSearch()
 	DFS.set_vertices(user_list,user_n_dfs_dic)
-	DFS.dfs()
+	#DFS.dfs()
 	#DFS.dfs_print()
 	print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-	vertices= DFS.dfs_f_sort()
+	DFS.scc()
 
 
 def transpose(user_list,user_n_dfs_dic):
@@ -531,23 +564,61 @@ def print_user(user_list,n_bfs):
 	print("")
 
 
-
-
-
-
 def main():
 	print_menu()
-	
-	menu_input=input("Select Menu:")
-	menu_input = int(menu_input)
+	menu_input=1
+	while menu_input!=0:
+		menu_input=input("Select Menu:")
+		menu_input = int(menu_input)
+		print("press 0 first")
+
 	if(menu_input==0):
 		a=menu_0()
-	if(menu_input==2):
-		menu_2(a[2])
+		menu_input1=1
+		while menu_input1 !=99:
+			print_menu()
+
+			menu_input1=input("select Menu 1 to 9")
+		
+			menu_input1=int(menu_input1)
+		
+			
+			if(menu_input1==1):
+				menu_1(a)
+		
+			if(menu_input1==2):
+				menu_2(a)
+			if(menu_input1==3):
+				
+				menu_3(a)
+			if(menu_input1==4):
+				
+				menu_4(a)
+			if(menu_input1==5):
+				
+				menu_5(a)
+			if(menu_input1==6):
+				
+				menu_6(a)
+			if(menu_input1==7):
+				
+				menu_7(a)
+			if(menu_input1==8):
+				menu_8(a)
+			if(menu_input1==9):
+				menu_9(a)
 
 
+	
+
+#main()
 a=menu_0()
-menu_8(a)
+#menu_2(a)
+
+
+
+#a=menu_0()
+menu_9(a)
 #menu_2(a)
 #menu_4(a)
 
