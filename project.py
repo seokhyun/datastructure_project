@@ -312,11 +312,14 @@ def menu_9(a):##not finished
 
 
 	making_friend_adj_list(user_list,user_friend_list)
-	from_person="1"
+	#from_person="101369657"
+	#find_person="111289103"
+	
+	
 	from_person=input("from whom?")
 	find_person=input("find whom?")
-	
-	find_person="1"
+	from_person=str(from_person)
+	find_person=str(find_person)
 	if from_person in user_n_bfs_dic and find_person in user_n_bfs_dic:
 		#print(user_list[user_n_bfs_dic[from_person]].num)
 		bfs(user_list, user_list[user_n_bfs_dic[from_person]],user_n_bfs_dic)
